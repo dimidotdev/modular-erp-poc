@@ -27,7 +27,7 @@
         <archunit.version>1.4.1</archunit.version>
         <uuid-creator.version>6.1.1</uuid-creator.version>
         <logstash-encoder.version>8.1</logstash-encoder.version>
-        <jjwt.version>0.12.6</jjwt.version>
+        <jjwt.version>0.13.0</jjwt.version>
         <testcontainers.version>1.21.3</testcontainers.version>
         <bouncycastle.version>1.84</bouncycastle.version>
         <azure-sdk-bom.version>1.2.38</azure-sdk-bom.version>
