@@ -1,13 +1,17 @@
-# Dependabot config — atualizações automáticas via PR para revisão.
+# Dependabot config — atualizações agrupadas via PR para revisão.
 
 version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
+      interval: "monthly"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 2
+    groups:
+      github-actions:
+        patterns:
+          - "*"
     commit-message:
       prefix: "chore(ci)"
       include: "scope"
@@ -18,17 +22,22 @@ updates:
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 10
+      interval: "monthly"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 2
+    groups:
+      non-breaking-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
     labels:
       - "dependencies"
-    # ignora bumps majors em libs sensíveis — exigem teste manual
+    # Atualizações major exigem revisão e planejamento explícitos.
     ignore:
-      - dependency-name: "org.springframework.boot:spring-boot-starter-parent"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "org.springframework.modulith:*"
+      - dependency-name: "*"
         update-types: ["version-update:semver-major"]
