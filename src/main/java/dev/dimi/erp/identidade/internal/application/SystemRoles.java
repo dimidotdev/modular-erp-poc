@@ -1,0 +1,367 @@
+package dev.dimi.erp.identidade.internal.application;
+
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Catálogo das system roles seed no provisionamento de um tenant.
+ *
+ * <p>System roles são imutáveis ({@code is_system=true}) e cobrem o perfil B2B padrão. Tenants
+ * podem criar roles próprias depois (slice futuro), mas as system não podem ser editadas/excluídas.
+ */
+public final class SystemRoles {
+
+  public static final SystemRole OWNER =
+      new SystemRole(
+          "OWNER",
+          "Proprietário",
+          "Acesso total ao tenant: todas as permissões funcionais e operações irreversíveis"
+              + " (cancelamento de NFe, anonimização LGPD, congelamento de período)."
+              + " Operações de plataforma (platform.*) não são concedidas via role — só via"
+              + " X-Bootstrap-Token no provisionamento.",
+          Set.of(
+              // Identidade
+              "usuario.consultar",
+              "usuario.criar",
+              "usuario.editar",
+              "usuario.permissoes.alterar",
+              "role.consultar",
+              "role.editar",
+              "senha.resetar.outro-usuario",
+              "mfa.resetar",
+              // Auditoria
+              "audit.consultar",
+              "audit.sensitive.consultar",
+              "audit.exportar",
+              "audit.administrar",
+              "lgpd.consultar",
+              // Cadastros
+              "pessoa.consultar",
+              "pessoa.criar",
+              "pessoa.editar",
+              "pessoa.deletar",
+              "pessoa.anonimizar",
+              "filial.consultar",
+              "filial.criar",
+              "filial.editar",
+              "filial.fiscal.editar",
+              "filial.certificado.gerenciar",
+              "funcionario.consultar",
+              "funcionario.contratar",
+              "funcionario.editar",
+              "funcionario.desligar",
+              "catalogo.consultar",
+              "catalogo.editar",
+              // Produto e Estoque
+              "produto.consultar",
+              "produto.criar",
+              "produto.editar",
+              "produto.preco.consultar",
+              "produto.preco.alterar",
+              "estoque.consultar",
+              "estoque.editar",
+              "estoque.ajustar",
+              "estoque.transferir",
+              // Movimentação
+              "pedido.consultar",
+              "pedido.criar",
+              "pedido.editar",
+              "pedido.aprovar",
+              "venda.consultar",
+              "venda.criar",
+              "venda.fechar",
+              "venda.cancelar",
+              "venda.credito.exceder",
+              "venda.desconto.exceder",
+              "devolucao.consultar",
+              "devolucao.criar",
+              "devolucao.fechar",
+              "transferencia.consultar",
+              "transferencia.criar",
+              "transferencia.fechar",
+              "saida-avulsa.consultar",
+              "saida-avulsa.criar",
+              // Compras
+              "compra.consultar",
+              "compra.solicitar",
+              "compra.solicitar.aprovacao-direta",
+              "compra.aprovar",
+              "compra.cotar",
+              "compra.pedir",
+              "compra.pedir.sem-cotacao",
+              "compra.receber",
+              "compra.receber.excesso",
+              "compra.cancelar",
+              "compra.devolver-fornecedor",
+              // Financeiro
+              "mvf.consultar",
+              "mvf.criar",
+              "mvf.editar",
+              "mvf.cancelar",
+              "mvf.renegociar",
+              "pagamento.consultar",
+              "pagamento.registrar",
+              "pagamento.estornar",
+              "plano-contas.consultar",
+              "plano-contas.editar",
+              "centro-custo.consultar",
+              "centro-custo.editar",
+              "conta-bancaria.consultar",
+              "conta-bancaria.editar",
+              "periodo.consultar",
+              "periodo.congelar",
+              "periodo.descongelar",
+              "tenant.config.consultar",
+              "tenant.config.editar",
+              "tenant.modulo.configurar",
+              "cnab.consultar",
+              "cnab.gerar",
+              "cnab.processar",
+              "conciliacao.consultar",
+              "conciliacao.executar",
+              "relatorio.financeiro",
+              // Fiscal
+              "nfe.consultar",
+              "nfe.emitir",
+              "nfe.cancelar",
+              "nfe.cce",
+              "nfe.inutilizar",
+              "nfe.contingencia",
+              "dfe.consultar",
+              "dfe.sincronizar",
+              "dfe.manifestar",
+              "fiscal.relatorios",
+              // Ordem de Serviço
+              "os.consultar",
+              "os.criar",
+              "os.editar",
+              "os.apontar-mao-obra",
+              "os.faturar",
+              "os.fechar",
+              "os.cancelar",
+              "os.configurar-workflow",
+              // Contratos
+              "contrato.consultar",
+              "contrato.criar",
+              "contrato.editar",
+              "contrato.ativar",
+              "contrato.suspender",
+              "contrato.encerrar",
+              "contrato.aditivar",
+              "contrato.reajustar",
+              "contrato.faturar"));
+
+  public static final SystemRole MANAGER =
+      new SystemRole(
+          "MANAGER",
+          "Gerente",
+          "Operacional + administrativo dentro do tenant. Sem operações de plataforma.",
+          Set.of(
+              "usuario.consultar",
+              "usuario.criar",
+              "usuario.editar",
+              "role.consultar",
+              "audit.consultar",
+              "lgpd.consultar",
+              "pessoa.consultar",
+              "pessoa.criar",
+              "pessoa.editar",
+              "filial.consultar",
+              "filial.editar",
+              "funcionario.consultar",
+              "funcionario.contratar",
+              "funcionario.editar",
+              "catalogo.consultar",
+              "catalogo.editar",
+              "produto.consultar",
+              "produto.criar",
+              "produto.editar",
+              "produto.preco.consultar",
+              "produto.preco.alterar",
+              "estoque.consultar",
+              "estoque.editar",
+              "estoque.transferir",
+              "pedido.consultar",
+              "pedido.aprovar",
+              "venda.consultar",
+              "venda.criar",
+              "venda.fechar",
+              "devolucao.consultar",
+              "devolucao.criar",
+              "devolucao.fechar",
+              "transferencia.consultar",
+              "transferencia.criar",
+              "transferencia.fechar",
+              "saida-avulsa.consultar",
+              "compra.consultar",
+              "compra.solicitar",
+              "compra.aprovar",
+              "compra.cotar",
+              "compra.pedir",
+              "compra.receber",
+              "mvf.consultar",
+              "mvf.criar",
+              "mvf.editar",
+              "pagamento.consultar",
+              "pagamento.registrar",
+              "plano-contas.consultar",
+              "centro-custo.consultar",
+              "conta-bancaria.consultar",
+              "tenant.config.consultar",
+              "tenant.config.editar",
+              "cnab.consultar",
+              "cnab.gerar",
+              "cnab.processar",
+              "conciliacao.consultar",
+              "conciliacao.executar",
+              "relatorio.financeiro",
+              "nfe.consultar",
+              "nfe.emitir",
+              "nfe.cce",
+              "dfe.consultar",
+              "dfe.sincronizar",
+              "dfe.manifestar",
+              "fiscal.relatorios",
+              "os.consultar",
+              "os.criar",
+              "os.editar",
+              "os.apontar-mao-obra",
+              "os.faturar",
+              "os.fechar",
+              "contrato.consultar",
+              "contrato.criar",
+              "contrato.editar",
+              "contrato.faturar"));
+
+  public static final SystemRole VENDEDOR =
+      new SystemRole(
+          "VENDEDOR",
+          "Vendedor",
+          "Operações de venda: pedido, fechamento, consulta de cliente/produto/estoque.",
+          Set.of(
+              "pessoa.consultar",
+              "pessoa.criar",
+              "pessoa.editar",
+              "produto.consultar",
+              "produto.preco.consultar",
+              "estoque.consultar",
+              "pedido.consultar",
+              "pedido.criar",
+              "pedido.editar",
+              "venda.consultar",
+              "venda.criar",
+              "venda.fechar",
+              "devolucao.consultar",
+              "devolucao.criar",
+              "saida-avulsa.consultar"));
+
+  public static final SystemRole OPERADOR_FINANCEIRO =
+      new SystemRole(
+          "OPERADOR_FINANCEIRO",
+          "Operador Financeiro",
+          "Gestão de MVF, pagamentos, conciliação, relatórios. Sem cancel/estorno (sensíveis).",
+          Set.of(
+              "pessoa.consultar",
+              "mvf.consultar",
+              "mvf.criar",
+              "mvf.editar",
+              "pagamento.consultar",
+              "pagamento.registrar",
+              "plano-contas.consultar",
+              "centro-custo.consultar",
+              "conta-bancaria.consultar",
+              "cnab.consultar",
+              "cnab.gerar",
+              "cnab.processar",
+              "conciliacao.consultar",
+              "conciliacao.executar",
+              "relatorio.financeiro"));
+
+  public static final SystemRole OPERADOR_FISCAL =
+      new SystemRole(
+          "OPERADOR_FISCAL",
+          "Operador Fiscal",
+          "Emissão e correção de NFe, DFe, SPED. Sem cancelamento (sensível).",
+          Set.of(
+              "filial.consultar",
+              "produto.consultar",
+              "venda.consultar",
+              "compra.consultar",
+              "os.consultar",
+              "nfe.consultar",
+              "nfe.emitir",
+              "nfe.cce",
+              "dfe.consultar",
+              "dfe.sincronizar",
+              "dfe.manifestar",
+              "fiscal.relatorios"));
+
+  public static final SystemRole OPERADOR_ESTOQUE =
+      new SystemRole(
+          "OPERADOR_ESTOQUE",
+          "Operador de Estoque",
+          "Recebimento, transferência, consulta. Sem ajuste manual (sensível).",
+          Set.of(
+              "produto.consultar",
+              "estoque.consultar",
+              "estoque.editar",
+              "estoque.transferir",
+              "transferencia.consultar",
+              "transferencia.criar",
+              "transferencia.fechar",
+              "compra.consultar",
+              "compra.receber"));
+
+  public static final SystemRole CONSULTA =
+      new SystemRole(
+          "CONSULTA",
+          "Consulta",
+          "Acesso somente-leitura amplo. Útil para auditores, contadores, sócios.",
+          Set.of(
+              "usuario.consultar",
+              "role.consultar",
+              "audit.consultar",
+              "pessoa.consultar",
+              "filial.consultar",
+              "funcionario.consultar",
+              "catalogo.consultar",
+              "produto.consultar",
+              "produto.preco.consultar",
+              "estoque.consultar",
+              "pedido.consultar",
+              "venda.consultar",
+              "devolucao.consultar",
+              "transferencia.consultar",
+              "saida-avulsa.consultar",
+              "compra.consultar",
+              "mvf.consultar",
+              "pagamento.consultar",
+              "plano-contas.consultar",
+              "centro-custo.consultar",
+              "conta-bancaria.consultar",
+              "periodo.consultar",
+              "cnab.consultar",
+              "conciliacao.consultar",
+              "relatorio.financeiro",
+              "nfe.consultar",
+              "dfe.consultar",
+              "os.consultar",
+              "contrato.consultar"));
+
+  public static final List<SystemRole> ALL =
+      List.of(
+          OWNER,
+          MANAGER,
+          VENDEDOR,
+          OPERADOR_FINANCEIRO,
+          OPERADOR_FISCAL,
+          OPERADOR_ESTOQUE,
+          CONSULTA);
+
+  private SystemRoles() {
+    // catalog
+  }
+
+  public record SystemRole(
+      String code, String displayName, String description, Set<String> permissions) {}
+}

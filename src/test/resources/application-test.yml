@@ -1,0 +1,29 @@
+erp-poc:
+  security:
+    jwt:
+      # Secret arbitrário ≥ 32 chars só para os ITs assinarem HS256.
+      secret: test-only-jwt-secret-test-only-jwt-secret
+      # TTLs curtos para que o lockout / expiração sejam testáveis sem time-travel.
+      access-token-ttl: PT15M
+      refresh-token-ttl: P7D
+      refresh-idle-ttl: PT24H
+      step-up-ttl: PT5M
+    bootstrap:
+      token: test-bootstrap-token
+  cadastros:
+    certificate:
+      # ITs usam o adapter local; nunca tocam Key Vault.
+      store: localfs
+      localfs:
+        # Diretório efêmero por execução — limpo pelos próprios testes.
+        dir: ${java.io.tmpdir}/modular-erp-poc-cert-test
+      expiry-job:
+        # Job não dispara em ITs (cron real seria ruído). Acionamos manualmente quando preciso.
+        enabled: false
+  fiscal:
+    # ITs sempre usam InMemoryFiscalProvider — AcbrFiscalProvider HTTP entra em ITs com WireMock
+    # marcados explicitamente em 8.3b.
+    provider: in-memory
+    tax:
+      icms:
+        default-rate: 18.00

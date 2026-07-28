@@ -1,0 +1,56 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### Application ###
+.env
+.env.*
+!.env.example
+*.log
+logs/
+*.pid
+
+### Certificados / chaves privadas (NUNCA commitar) ###
+# Cert A1 e-CNPJ + qualquer material criptográfico vive no Key Vault, não no repo.
+# Testes geram PKCS#12 sintético em memória via TestPkcs12Generator.
+*.pfx
+*.p12
+*.cer
+*.crt
+*.pem
+*.key
+*.jks
+var/cert-local/
+
+### Spring Modulith generated docs ###
+target/spring-modulith-docs/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/

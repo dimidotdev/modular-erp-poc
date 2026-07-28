@@ -1,0 +1,20 @@
+# =============================================================================
+# Profile: local
+# =============================================================================
+# Ative explicitamente com SPRING_PROFILES_ACTIVE=local.
+# Postgres esperado em :5432 (db/user/pwd=modular_erp_poc). Defaults
+# para ERP_POC_* env vars em application.yml permitem subir sem nenhuma config.
+# Logs: pretty via logback-spring.xml (springProfile "local | test").
+# Cert A1 store: localfs (./var/cert-local) — sem dependência de Azure.
+# =============================================================================
+
+logging:
+  level:
+    dev.dimi.erp: DEBUG
+    org.springframework.security: INFO
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true

@@ -1,0 +1,169 @@
+spring:
+  application:
+    name: modular-erp-poc
+  threads:
+    virtual:
+      enabled: true
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+      indent-output: false
+    deserialization:
+      fail-on-unknown-properties: false
+  datasource:
+    url: ${ERP_POC_DATABASE_URL:jdbc:postgresql://localhost:5432/modular_erp_poc}
+    username: ${ERP_POC_DATABASE_USERNAME:modular_erp_poc}
+    password: ${ERP_POC_DATABASE_PASSWORD:modular_erp_poc}
+    hikari:
+      maximum-pool-size: ${ERP_POC_DATABASE_POOL_MAX:20}
+      minimum-idle: ${ERP_POC_DATABASE_POOL_MIN:5}
+      connection-timeout: 10000
+      idle-timeout: 300000
+      max-lifetime: 1800000
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 3MB
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc.time_zone: UTC
+        format_sql: false
+        # Sem default_schema: tabelas tenant-scoped (role, user_account, ...) não têm prefixo
+        # e resolvem via search_path setado pelo SchemaPerTenantConnectionProvider; tabelas
+        # cross-tenant (shared.tenant, audit.audit_event) usam schema explícito na @Table/SQL.
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled: true
+    # Schemas geridos pelo Flyway no boot (cria se não existirem).
+    default-schema: shared
+    schemas: shared,audit,platform
+    # Locations relativas a classpath:.
+    # - global/ : migrations aplicadas uma vez no boot, referenciam shared/audit/platform.
+    # - tenant/ : NÃO carregada aqui; é aplicada por tenant via TenantProvisioningService.
+    locations: classpath:db/migration/global
+    baseline-on-migrate: true
+    create-schemas: true
+  modulith:
+    events:
+      jdbc:
+        schema-initialization:
+          enabled: false
+      republish-outstanding-events-on-restart: true
+
+server:
+  port: ${ERP_POC_SERVER_PORT:8080}
+  shutdown: graceful
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+    include-exception: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+erp-poc:
+  security:
+    password:
+      argon2:
+        salt-length: 16
+        hash-length: 32
+        parallelism: 4
+        memory-kb: 65536
+        iterations: 3
+    jwt:
+      issuer: modular-erp-poc
+      access-token-ttl: PT15M
+      refresh-token-ttl: P7D
+      refresh-idle-ttl: PT24H
+      # Janela de validade do step-up (re-autenticação para operação sensível).
+      # Token de step-up continua respeitando access-token-ttl; este TTL limita
+      # quanto tempo a claim `sua` é considerada "fresca" pelo guard de endpoint.
+      step-up-ttl: PT5M
+      secret: ${ERP_POC_SECURITY_JWT_SECRET:CHANGE-ME-LOCAL-ONLY-NOT-FOR-PRODUCTION-32CHARS-MIN}
+    bootstrap:
+      # Token de bootstrap para o endpoint POST /api/v1/platform/tenants.
+      # Vazio = endpoint completamente desabilitado (responde 401).
+      # Em prod, vem do Key Vault via ERP_POC_SECURITY_BOOTSTRAP_TOKEN.
+      token: ${ERP_POC_SECURITY_BOOTSTRAP_TOKEN:}
+  cadastros:
+    certificate:
+      # Backend de armazenamento do PFX+senha do certificado A1.
+      #   localfs (default) — arquivos JSON em disco, dev/test apenas.
+      #   keyvault         — Azure Key Vault Secret (encryption-at-rest + versionamento).
+      store: ${ERP_POC_CERTIFICATE_STORE:localfs}
+      localfs:
+        dir: ${ERP_POC_CERTIFICATE_LOCALFS_DIR:./var/cert-local}
+      keyvault:
+        endpoint: ${ERP_POC_CERTIFICATE_KEYVAULT_ENDPOINT:}
+      expiry-job:
+        enabled: ${ERP_POC_CERTIFICATE_EXPIRY_JOB_ENABLED:true}
+        # Cron Spring (6 campos): default 06:00 UTC todo dia.
+        cron: ${ERP_POC_CERTIFICATE_EXPIRY_JOB_CRON:0 0 6 * * *}
+    viacep:
+      # Lookup de CEP (RN-CAD-015). Sem auth no ViaCEP. Timeouts curtos por design:
+      # lookup é opcional, então preferimos falhar rápido e deixar o usuário digitar manualmente.
+      base-url: ${ERP_POC_VIACEP_BASE_URL:https://viacep.com.br/ws}
+      connect-timeout: ${ERP_POC_VIACEP_CONNECT_TIMEOUT:PT2S}
+      request-timeout: ${ERP_POC_VIACEP_REQUEST_TIMEOUT:PT4S}
+      cache:
+        # Caffeine in-process, sem persistência. ttl curta o bastante para refletir
+        # atualizações de logradouro do ViaCEP em poucos minutos; maximumSize bound contra
+        # ataque com CEPs aleatórios.
+        maximum-size: ${ERP_POC_VIACEP_CACHE_MAX:1000}
+        ttl: ${ERP_POC_VIACEP_CACHE_TTL:PT30M}
+  fiscal:
+    # Provider de emissão fiscal. in-memory (default) usado em dev/test; acbr é o
+    # AcbrFiscalProvider HTTP introduzido em 8.3b apontando para o sidecar ACBrMonitor.
+    provider: ${ERP_POC_FISCAL_PROVIDER:in-memory}
+    tax:
+      icms:
+        # Alíquota interna do ICMS aplicada em CST 00/20 quando não há override por UF/NCM.
+        # 18% é o valor mais comum (SP/MG/PR); estados como SC/RS/ES usam 17% e PI/MA 20-22%.
+        # Refino com tabela por UF entra em slice posterior.
+        default-rate: ${ERP_POC_FISCAL_ICMS_DEFAULT_RATE:18.00}
+    # Adapter HTTP contra a ACBr API SaaS (sandbox: hom.acbr.api.br / prod: acbr.api.br).
+    # Ativado quando erp-poc.fiscal.provider=acbr-api (default in-memory dev/test).
+    acbr-api:
+      base-url: ${ACBR_API_BASE_URL:https://hom.acbr.api.br}
+      auth:
+        token-url: ${ACBR_API_AUTH_URL:https://auth.acbr.api.br/realms/ACBrAPI/protocol/openid-connect/token}
+        client-id: ${ACBR_API_CLIENT_ID:}
+        client-secret: ${ACBR_API_CLIENT_SECRET:}
+      timeouts:
+        connect-ms: ${ACBR_API_CONNECT_MS:5000}
+        read-ms: ${ACBR_API_READ_MS:30000}
+  # multitenancy, acbr, storage: configs adicionadas nos slices respectivos.
+
+# OpenAPI / Swagger UI (springdoc-openapi). Seguro por default; o profile local habilita.
+# OpenApiConfig.java cuida do info bean + bearer auth scheme JWT.
+springdoc:
+  api-docs:
+    enabled: ${ERP_POC_OPENAPI_ENABLED:false}
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: ${ERP_POC_SWAGGER_UI_ENABLED:false}
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+    display-request-duration: true
+    try-it-out-enabled: true
+  show-actuator: false
+  default-produces-media-type: application/json

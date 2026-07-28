@@ -1,0 +1,39 @@
+# Reduz o build context enviado ao Docker daemon.
+# IMPORTANTE: .mvn/ NÃO entra aqui — é copiado pelo Dockerfile e necessário para ./mvnw.
+
+# VCS / IDE
+.git
+.github
+.gitignore
+.gitattributes
+.editorconfig
+.idea
+.vscode
+**/*.iml
+
+# Build output
+target
+**/target
+
+# Docs / artefatos de runtime
+docs
+README.md
+HELP.md
+*.log
+
+# Locais de cert/chave (defesa em profundidade — também no .gitignore)
+*.pfx
+*.p12
+*.pem
+*.key
+*.jks
+var
+src/main/resources/cert-local
+
+# Env / segredos
+.env
+.env.*
+
+# OS
+**/.DS_Store
+**/Thumbs.db
