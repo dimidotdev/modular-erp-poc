@@ -26,7 +26,7 @@
         <spring-modulith.version>1.4.1</spring-modulith.version>
         <archunit.version>1.4.1</archunit.version>
         <uuid-creator.version>6.1.1</uuid-creator.version>
-        <logstash-encoder.version>8.1</logstash-encoder.version>
+        <logstash-encoder.version>9.0</logstash-encoder.version>
         <jjwt.version>0.12.6</jjwt.version>
         <testcontainers.version>1.21.3</testcontainers.version>
         <bouncycastle.version>1.84</bouncycastle.version>
