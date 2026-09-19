@@ -29,7 +29,7 @@
         <logstash-encoder.version>8.1</logstash-encoder.version>
         <jjwt.version>0.12.6</jjwt.version>
         <testcontainers.version>1.21.3</testcontainers.version>
-        <bouncycastle.version>1.84</bouncycastle.version>
+        <bouncycastle.version>1.85</bouncycastle.version>
         <azure-sdk-bom.version>1.2.38</azure-sdk-bom.version>
 
         <!-- plugins -->
